@@ -64,6 +64,8 @@ const params = deptName;
         'Add Department',
         'Update Employee Manager',
         'View Employees By Manager',
+        'View Employees By Department',
+        'Delete Department',
         'Quit'],
         name: 'option'
     }).then(function(answer){
@@ -102,6 +104,14 @@ const params = deptName;
 
             case "View Employees By Manager":
                 empByManager();
+                break;
+
+            case "View Employees By Department":
+                empDepartment();
+                break;
+
+            case "Delete Department":
+                delDept();
                 break;
 
             case "Quit":
@@ -419,6 +429,59 @@ function empByManager() {
             })
         });
 
+
+    });
+}
+
+function empDepartment() {
+    db.query(`SELECT employee.id, employee.first_name, employee.last_name, department.dept_name AS department
+    FROM employee
+    LEFT JOIN role_name ON employee.role_id = role_name.id
+    LEFT JOIN department ON role_name.department_id = department.id`, function (err, results) {
+ if(err) {
+     console.error(err.message)
+ } else {
+ console.table(results);
+ startApp();
+ };
+});
+};
+
+
+function delDept() {
+
+
+    db.query('SELECT *  FROM department', (err,results) => {
+        if(err) {
+            console.error(err.message);
+        }
+        let deptChoices = results.map((dept) => ({
+            name: dept.dept_name,
+            value: dept.id
+        }));
+
+        inquirer.prompt([
+            {
+                type: "list",
+                message: "Select the Department you would like to delete.",
+                name: "delDept",
+                choices: deptChoices
+            }
+        ]).then(function(answer){
+            const del_id = answer.delDept;
+
+            const sql = 'DELETE FROM department WHERE id = ?';
+            const params = del_id
+
+            db.query(sql, params, (err,result) => {
+                if (err) {
+                    console.error(err.message);
+                } else {
+                    console.log('Successfully Deleted Department.');
+                    startApp();
+                }
+            })
+        });
 
     });
 }
