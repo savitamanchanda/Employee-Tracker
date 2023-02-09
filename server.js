@@ -1,5 +1,6 @@
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
+const e = require('express');
 
 
 
@@ -61,6 +62,8 @@ const params = deptName;
         'Add Role',
         'View All Departments', 
         'Add Department',
+        'Update Employee Manager',
+        'View Employees By Manager',
         'Quit'],
         name: 'option'
     }).then(function(answer){
@@ -91,6 +94,14 @@ const params = deptName;
 
             case "Add Department":
                 addDepts();
+                break;
+
+            case "Update Employee Manager":
+                employeeManager();
+                break;
+
+            case "View Employees By Manager":
+                empByManager();
                 break;
 
             case "Quit":
@@ -315,4 +326,99 @@ function addDepts() {
 
 function quit() {
     process.exit();
+}
+
+function employeeManager() {
+
+    db.query('SELECT * FROM employee', (err,res) => {
+        if(err) {
+            console.error(err.message);
+        };
+        const employee = res.map((employee) => ({
+            name: employee.first_name,
+            value: employee.id
+
+        }))
+    
+   
+     db.query('SELECT * FROM employee', (err,res) => {
+        if(err) {
+            console.error(err.message);
+        } 
+        const manager = res.map((manager) => ({
+            name: manager.first_name,
+            value: manager.id
+        }));
+        
+        inquirer.prompt([
+        {
+            type: "list",
+            message: "Select the employee whose manager you would like to update.",
+            name: "name",
+            choices: employee
+        },
+        {
+            type: "list",
+            message: "Select the new manager for the employee.",
+            choices: manager,
+            name: "manager"
+        }
+    ]).then(function(answer){
+        const emp_name = answer.name;
+        const manager_name = answer.manager;
+
+
+        const sql = 'UPDATE employee SET manager_id = ? WHERE id = ?';
+        const params = [manager_name, emp_name]
+            db.query(sql, params, (err,result) => {
+                if (err) {
+                    console.error(err.message);
+                } else {
+                    console.log('Successfully updated Manager.');
+                    startApp();
+                }
+            })
+        
+        })
+    })
+    })
+
+}
+
+function empByManager() {
+
+    db.query('SELECT * FROM employee WHERE manager_id IS NOT NULL', (err,res) => {
+        if(err) {
+            console.error(err.message);
+        } 
+        const manager = res.map((manager) => ({
+            name: manager.first_name,
+            value: manager.id
+        }));
+
+        inquirer.prompt([
+            {
+                type: "list",
+                message: "Select the manager whose employee you would like to view.",
+                name: "mg",
+                choices: manager
+            }
+        ]).then(function(answer){
+            const mg_id = answer.mg;
+
+            const sql = 'SELECT * FROM employee WHERE manager_id = ?';
+            const params = mg_id
+
+            db.query(sql, params, (err,result) => {
+                if (err) {
+                    console.error(err.message);
+                } else {
+                    console.table(result);
+                    startApp();
+                }
+            })
+        });
+
+
+    });
 }
