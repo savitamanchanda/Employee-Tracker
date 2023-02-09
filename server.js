@@ -66,6 +66,7 @@ const params = deptName;
         'View Employees By Manager',
         'View Employees By Department',
         'Delete Department',
+        'Delete Role',
         'Quit'],
         name: 'option'
     }).then(function(answer){
@@ -112,6 +113,10 @@ const params = deptName;
 
             case "Delete Department":
                 delDept();
+                break;
+
+            case "Delete Role":
+                delRole();
                 break;
 
             case "Quit":
@@ -478,6 +483,43 @@ function delDept() {
                     console.error(err.message);
                 } else {
                     console.log('Successfully Deleted Department.');
+                    startApp();
+                }
+            })
+        });
+
+    });
+};
+
+function delRole() {
+
+    db.query('SELECT *  FROM role_name', (err,results) => {
+        if(err) {
+            console.error(err.message);
+        }
+        let roleChoices = results.map((role) => ({
+            name: role.title,
+            value: role.id
+        }));
+
+        inquirer.prompt([
+            {
+                type: "list",
+                message: "Select the Role you would like to delete.",
+                name: "delRole",
+                choices: roleChoices
+            }
+        ]).then(function(answer){
+            const del_id = answer.delRole;
+
+            const sql = 'DELETE FROM role_name WHERE id = ?';
+            const params = del_id
+
+            db.query(sql, params, (err,result) => {
+                if (err) {
+                    console.error(err.message);
+                } else {
+                    console.log('Successfully Deleted Role.');
                     startApp();
                 }
             })
