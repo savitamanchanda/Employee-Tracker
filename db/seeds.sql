@@ -17,9 +17,9 @@ VALUES ("Financial Analyst", 75000, 1),
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ("Andrea", "Nichola", 1, NULL),
        ("Jennifer", "Smith", 2, NULL),
-       ("Sam", "Rhoads", 3, 3),
+       ("Sam", "Rhoads", 3, NULL),
        ("Daniel", "Brown", 4, NULL),
        ("Harry", "James", 5, NULL),
-       ("Somya", "Gupta", 6, 6),
+       ("Somya", "Gupta", 6, NULL),
        ("Savita", "Manchanda", 7, NULL),
        ("Keith", "Scott", 8, NULL);
