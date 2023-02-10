@@ -1,6 +1,7 @@
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
 const e = require('express');
+const cTable = require('console.table');
 
 
 
@@ -413,7 +414,7 @@ function employeeManager() {
 
 function empByManager() {
 
-    db.query('SELECT * FROM employee WHERE manager_id IS NOT NULL', (err,res) => {
+    db.query('SELECT * FROM employee WHERE manager_id IS NULL', (err,res) => {
         if(err) {
             console.error(err.message);
         } 
