@@ -81,7 +81,7 @@ THEN I am prompted to select an employee to update and their new role and this i
 
   ## Links to the Deployed Application 
 
-  * The URL of the deployed application - 
+  * The URL of the deployed application - https://savitamanchanda.github.io/Employee-Tracker/
 
   * The URL of the GitHub repository - https://github.com/savitamanchanda/Employee-Tracker
 

@@ -5,6 +5,7 @@ const e = require('express');
 
 
 
+
 const db = mysql.createConnection(
     {
       host: 'localhost',
@@ -67,6 +68,8 @@ const params = deptName;
         'View Employees By Department',
         'Delete Department',
         'Delete Role',
+        'Delete Employee',
+        'View Total Utilised Budget',
         'Quit'],
         name: 'option'
     }).then(function(answer){
@@ -117,6 +120,14 @@ const params = deptName;
 
             case "Delete Role":
                 delRole();
+                break;
+
+            case "Delete Employee":
+                delEmp();
+                break;
+
+            case "View Total Utilised Budget":
+                viewBudget();
                 break;
 
             case "Quit":
@@ -526,4 +537,56 @@ function delRole() {
         });
 
     });
+};
+
+function delEmp() {
+
+    db.query('SELECT *  FROM employee', (err,results) => {
+        if(err) {
+            console.error(err.message);
+        }
+        let empChoices = results.map((emp) => ({
+            name: emp.first_name,
+            value: emp.id
+        }));
+
+        inquirer.prompt([
+            {
+                type: "list",
+                message: "Select the Employee you would like to delete.",
+                name: "delEmp",
+                choices: empChoices
+            }
+        ]).then(function(answer){
+            const del_id = answer.delEmp;
+
+            const sql = 'DELETE FROM employee WHERE id = ?';
+            const params = del_id
+
+            db.query(sql, params, (err,result) => {
+                if (err) {
+                    console.error(err.message);
+                } else {
+                    console.log('Successfully Deleted Employee.');
+                    startApp();
+                }
+            })
+        });
+
+    });
+};
+
+function viewBudget() {
+
+    db.query(`SELECT department_id, SUM(salary), department.dept_name FROM role_name 
+    LEFT JOIN department ON role_name.department_id = department.id 
+    GROUP BY department_id`, function (err, results) {
+        if(err) {
+            console.error(err.message)
+        } else {
+        console.table(results);
+        startApp();
+        };
+      });
+
 }
